@@ -1,0 +1,59 @@
+<!-- templates/report_template.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Evaluación ISO</title>
+</head>
+<body>
+    <div class="header">
+        <h1>Reporte de Evaluación ISO</h1>
+        <h2>{{ empresa_evaluada }}</h2>
+        <h3>{{ estandar }}</h3>
+    </div>
+
+    <div class="section">
+        {% for proceso in procesos %}
+        <div class="proceso">
+            <h3>{{ proceso.nombre }} <span class="porcentaje">{{ proceso.porcentaje_cumplimiento }}%</span></h3>
+            
+            {% for actividad in proceso.actividades %}
+            <div class="actividad">
+                <h4>{{ actividad.nombre }} <span class="porcentaje">{{ actividad.porcentaje_cumplimiento }}%</span></h4>
+                
+                {% for tarea in actividad.tareas %}
+                <div class="tarea">
+                    <h5>{{ tarea.nombre }} <span class="porcentaje">{{ tarea.porcentaje_cumplimiento }}%</span></h5>
+                    
+                    {% for pregunta in tarea.preguntas %}
+                    <div class="pregunta">
+                        <p>{{ pregunta.texto }} - {{ pregunta.cumplimiento }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="conclusiones">
+        <h3>Conclusiones</h3>
+        <ul>
+            {% for conclusion in conclusiones %}
+            <li>{{ conclusion }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="recomendaciones">
+        <h3>Recomendaciones</h3>
+        <ul>
+            {% for recomendacion in recomendaciones %}
+            <li>{{ recomendacion }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
