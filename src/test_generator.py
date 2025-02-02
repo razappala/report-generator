@@ -1,4 +1,6 @@
 # src/test_generator.py
+import os
+import shutil
 
 def get_test_data():
     return { 
@@ -35,41 +37,105 @@ def get_test_data():
             "Realizar auditoría interna trimestral" 
         ] 
     }
+    
+def clean_output_folder():
+    """Limpia la carpeta output antes de generar nuevos archivos."""
+    output_folder = 'output'
+    if os.path.exists(output_folder):
+        # Eliminar todos los archivos en la carpeta output
+        for filename in os.listdir(output_folder):
+            file_path = os.path.join(output_folder, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print(f"Error al eliminar {file_path}: {e}")
+    else:
+        # Crear la carpeta output si no existe
+        os.makedirs(output_folder, exist_ok=True)
 
 def test_generator():
-    try:
-        from pdf_generator import PDFGeneratorFactory
-        
-        print("\nIniciando generación de PDF...")
-        
-        # Crear instancia del generador
-        generator = PDFGeneratorFactory.create_generator()
-        
-        # Obtener datos de prueba
-        data = get_test_data()
-        
-        # Generar HTML desde el template
-        print("Generando HTML desde template...")
-        html_content = generator.render_template('report_template.html', data)
-        
-        # Generar PDF
-        print("Generando PDF...")
-        pdf_content = generator.generate_pdf(
-            html_content,
-            css_file='static/css/styles.css'
-        )
-        
-        # Guardar PDF
-        output_file = 'reporte.pdf'
-        with open(output_file, 'wb') as f:
-            f.write(pdf_content)
-        
-        print(f"PDF generado exitosamente: {output_file}")
-        return True
-    except Exception as e:
-        print(f"Error al generar PDF: {str(e)}")
-        return False
+    from pdf_generator import PDFGeneratorFactory
+    
+    # Limpiar la carpeta output antes de generar nuevos archivos
+    clean_output_folder()
+    
+    print("\n" + "="*55)
+    print("=== TESTEO DE TODOS LOS GENERADORES DISPONIBLES ===")
+    print("="*55)
+    
+    # Obtener todos los tipos de generadores registrados
+    available_generators = PDFGeneratorFactory.get_available_generators()
+    
+    results = {
+        'success': [],
+        'errors': []
+    }
+
+    for generator_type in available_generators:
+        try:
+            print(f"\n\n🔁 [{generator_type.upper()}] Iniciando prueba...")
+            
+            # Crear instancia del generador
+            generator = PDFGeneratorFactory.create_generator(generator_type)
+            print(f"✅ [{generator_type.upper()}] Factory creada")
+            
+            # Obtener datos de prueba
+            data = get_test_data()
+            
+            # Fase 1: Generar HTML
+            print(f"🖨️ [{generator_type.upper()}] Renderizando template...")
+            html_content = generator.render_template('report_template.html', data)
+            
+            # Fase 2: Generar PDF
+            print(f"📄 [{generator_type.upper()}] Convirtiendo a PDF...")
+            pdf_content = generator.generate_pdf(
+                html_content, 
+                css_file='static/css/styles.css'
+            )
+            
+            # Guardar PDF
+            # Guardar PDF en la carpeta output
+            output_file = f'output/reporte_{generator_type}.pdf'
+            with open(output_file, 'wb') as f:
+                f.write(pdf_content)
+            
+            print(f"🎉 [{generator_type.upper()}] Éxito! Archivo: {output_file}")
+            results['success'].append(generator_type)
+            
+        except ImportError as e:
+            error_msg = f"🚫 [{generator_type.upper()}] Dependencias faltantes: {str(e)}"
+            print(error_msg)
+            results['errors'].append(error_msg)
+            
+        except Exception as e:
+            error_msg = f"❌ [{generator_type.upper()}] Error: {type(e).__name__} - {str(e)}"
+            print(error_msg)
+            results['errors'].append(error_msg)
+            
+        print(f"⏳ [{generator_type.upper()}] Prueba completada")
+        print("-" * 60)
+
+    # Reporte final
+    print("\n\n" + "="*55)
+    print("=== RESUMEN FINAL ===")
+    print(f"Generadores probados: {len(available_generators)}")
+    print(f"✅ Éxitos: {len(results['success'])}")
+    print(f"🚫 Errores: {len(results['errors'])}")
+    
+    if results['errors']:
+        print("\nDetalle de errores:")
+        for error in results['errors']:
+            print(f"  • {error}")
+    
+    print("="*55 + "\n")
+    
+    return len(results['errors']) == 0
 
 if __name__ == '__main__':
-    print("=== Generador de Reportes PDF ===")
+    print("\n" + "="*55)
+    print("=== SISTEMA DE PRUEBAS DE GENERADORES PDF ===")
+    print("="*55 + "\n")
     test_generator()
