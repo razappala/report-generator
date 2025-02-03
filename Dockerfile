@@ -27,9 +27,6 @@ RUN apt-get update && apt-get install -y \
 # Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiar todo el código fuente y recursos
-COPY . /app
-
 # Instalar dependencias de Python
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
