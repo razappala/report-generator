@@ -87,13 +87,13 @@ def test_generator():
             
             # Fase 1: Generar HTML
             print(f"🖨️ [{generator_type.upper()}] Renderizando template...")
-            html_content = generator.render_template('report_template.html', data)
+            html_content = generator.render_template('index.html', data)
             
             # Fase 2: Generar PDF
             print(f"📄 [{generator_type.upper()}] Convirtiendo a PDF...")
             pdf_content = generator.generate_pdf(
                 html_content, 
-                css_file='static/css/styles.css'
+                css_file='static/css/styles2.css'
             )
             
             # Guardar PDF
