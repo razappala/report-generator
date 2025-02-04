@@ -3,7 +3,8 @@ FROM python:3.11-slim
 # Configurar variables de entorno para pip
 ENV PIP_DEFAULT_TIMEOUT=100 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    XDG_RUNTIME_DIR=/tmp/runtime-root
 
 # Instalar dependencias del sistema para WeasyPrint y wkhtmltopdf
 RUN apt-get update && apt-get install -y \
