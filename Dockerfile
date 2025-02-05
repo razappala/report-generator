@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-# Configurar variables de entorno para pip
+# Configurar variables de entorno para pip y XDG_RUNTIME_DIR
 ENV PIP_DEFAULT_TIMEOUT=100 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1 \
@@ -22,18 +22,25 @@ RUN apt-get update && apt-get install -y \
     wget \
     xvfb \
     wkhtmltopdf \
+    libxrender1 \
+    libfontconfig1 \
+    libfreetype6 \
+    libjpeg62-turbo \
+    libpng-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Establecer directorio de trabajo
 WORKDIR /app
 
+# Copiar el archivo requirements.txt
+COPY requirements.txt /app/requirements.txt
+
 # Instalar dependencias de Python
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
 # Establecer permisos para la carpeta output
-RUN mkdir -p /app/output && chmod -R 755 /app && chmod 777 /app/output
-
+RUN mkdir -p /app/output && chmod -R 755 /app && chmod 777 /app/output\
 # Comando por defecto
-CMD ["python", "src/test_generator.py"]
+CMD ["xvfb-run", "python", "src/test_generator.py"]
