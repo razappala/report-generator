@@ -1,6 +1,10 @@
 # src/test_generator.py
 import os
 import shutil
+import time
+import os
+from PyPDF2 import PdfMerger
+import shutil
 
 def get_test_data():
     return { 
@@ -139,3 +143,126 @@ if __name__ == '__main__':
     print("=== SISTEMA DE PRUEBAS DE GENERADORES PDF ===")
     print("="*55 + "\n")
     test_generator()
+    
+# def test_generator():
+#     from pdf_generator import PDFGeneratorFactory
+
+#     # Limpiar la carpeta output antes de generar nuevos archivos
+#     clean_output_folder()
+
+#     print("\n" + "="*55)
+#     print("=== TESTEO DE TODOS LOS GENERADORES DISPONIBLES ===")
+#     print("="*55)
+
+#     # Obtener todos los tipos de generadores registrados
+#     available_generators = PDFGeneratorFactory.get_available_generators()
+#     print(f"Generadores disponibles: {available_generators}")
+
+#     results = {
+#         'success': [],
+#         'errors': []
+#     }
+
+#     # Diccionario para almacenar tiempos y pesos de archivos por generador
+#     performance_results = {
+#         generator_type: {'times': [], 'sizes': []}
+#         for generator_type in available_generators
+#     }
+
+#     for iteration in range(10):  # Iterar 10 veces
+#         print(f"\n=== ITERACIÓN {iteration + 1} ===")
+#         for generator_type in available_generators:
+#             try:
+#                 print(f"\n\n🔁 [{generator_type.upper()}] Iniciando prueba...")
+
+#                 # Inicio de la solicitud
+#                 start_time = time.time()
+#                 print(f"⏰ [{generator_type.upper()}] Inicio de la solicitud: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+
+#                 # Crear instancia del generador
+#                 generator = PDFGeneratorFactory.create_generator(generator_type)
+#                 print(f"✅ [{generator_type.upper()}] Factory creada")
+
+#                 # Obtener datos de prueba
+#                 data = get_test_data()
+
+#                 # Inicializar el merger de PDFs
+#                 merger = PdfMerger()
+
+#                 # Generar y concatenar 30 PDFs
+#                 for i in range(30):
+#                     print(f"🖨️ [{generator_type.upper()}] Renderizando template... Iteración {i+1}")
+#                     html_content = generator.render_template('index.html', data)
+#                     print(f"📄 [{generator_type.upper()}] Convirtiendo a PDF... Iteración {i+1}")
+#                     pdf_content = generator.generate_pdf(
+#                         html_content,
+#                         css_file='static/css/styles2.css'
+#                     )
+#                     temp_pdf_file = f'output/temp_{generator_type}_{i}.pdf'
+#                     with open(temp_pdf_file, 'wb') as f:
+#                         f.write(pdf_content)
+#                     merger.append(temp_pdf_file)
+#                     os.remove(temp_pdf_file)
+
+#                 output_file = f'output/reporte_{generator_type}.pdf'
+#                 with open(output_file, 'wb') as f:
+#                     merger.write(f)
+#                 merger.close()
+
+#                 file_size = os.path.getsize(output_file) / 1024  # Tamaño en KB
+#                 print(f"📦 [{generator_type.upper()}] Peso del archivo: {file_size:.2f} KB")
+
+#                 end_time = time.time()
+#                 duration = end_time - start_time
+#                 print(f"⏰ [{generator_type.upper()}] Fin de la solicitud: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+#                 print(f"⏱️ [{generator_type.upper()}] Duración de la solicitud: {duration:.2f} segundos")
+
+#                 print(f"🎉 [{generator_type.upper()}] Éxito! Archivo: {output_file}")
+#                 results['success'].append(generator_type)
+
+#                 performance_results[generator_type]['times'].append(duration)
+#                 performance_results[generator_type]['sizes'].append(file_size)
+
+#             except ImportError as e:
+#                 error_msg = f"🚫 [{generator_type.upper()}] Dependencias faltantes: {str(e)}"
+#                 print(error_msg)
+#                 results['errors'].append(error_msg)
+
+#             except Exception as e:
+#                 error_msg = f"❌ [{generator_type.upper()}] Error: {type(e).__name__} - {str(e)}"
+#                 print(error_msg)
+#                 results['errors'].append(error_msg)
+
+#             print(f"⏳ [{generator_type.upper()}] Prueba completada")
+#             print("-" * 60)
+
+#     print("\n\n" + "="*55)
+#     print("=== RESUMEN FINAL ===")
+#     print(f"Generadores probados: {len(available_generators)}")
+#     print(f"✅ Éxitos: {len(results['success'])}")
+#     print(f"🚫 Errores: {len(results['errors'])}")
+
+#     if results['errors']:
+#         print("\nDetalle de errores:")
+#         for error in results['errors']:
+#             print(f"  • {error}")
+
+#     print("\nDetalle de tiempos y pesos de archivos por generador:")
+#     for generator_type, metrics in performance_results.items():
+#         print(f"\n🔍 [{generator_type.upper()}]")
+#         for i in range(len(metrics['times'])):
+#             print(f"  • Iteración {i+1}: {metrics['times'][i]:.2f} segundos, {metrics['sizes'][i]:.2f} KB")
+
+#         avg_time = sum(metrics['times']) / len(metrics['times'])
+#         avg_size = sum(metrics['sizes']) / len(metrics['sizes'])
+#         print(f"\n📊 [{generator_type.upper()}] Promedio final: {avg_time:.2f} segundos, {avg_size:.2f} KB")
+
+#     print("="*55 + "\n")
+
+#     return len(results['errors']) == 0
+
+# if __name__ == '__main__':
+#     print("\n" + "="*55)
+#     print("=== SISTEMA DE PRUEBAS DE GENERADORES PDF ===")
+#     print("="*55 + "\n")
+#     test_generator()

@@ -147,8 +147,8 @@ class PDFGeneratorFactory:
     
     _GENERATORS = {
         'xhtml2pdf': XHTML2PDFGenerator,
+        'pdfkit': PDFKitGenerator,
         'weasyprint': WeasyPrintGenerator,
-        'pdfkit': PDFKitGenerator
     }
     
     @classmethod
